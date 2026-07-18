@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Voices at Vutto</title>
+<meta name="description" content="Everyone wants to do their best. They all have a way. Their own way. Find your primary and secondary voice." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+/* ============ DESIGN TOKENS ============ */
+:root{
+  --crimson:#D23757;
+  --crimson-dk:#B32A46;
+  --wash:#FCE8EF;
+  --bg:#FFFFFF;
+  --paper:#FBFAFB;
+  --ink:#141217;
+  --ink-2:#514B57;
+  --ink-3:#8A8390;
+  --line:#EDE9EC;
+  --line-2:#E2DCE3;
+  --ok:#22C55E;
+  --r:16px;
+  --r-sm:12px;
+  --shadow:0 1px 2px rgba(20,18,23,.04), 0 8px 30px rgba(20,18,23,.06);
+  --shadow-lg:0 24px 60px rgba(20,18,23,.14);
+  /* voice colors (GiANT authentic) */
+  --nurturer:#2E3192;
+  --guardian:#D64F2A;
+  --connector:#1B8FC7;
+  --creative:#F4A11E;
+  --pioneer:#3EA972;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Plus Jakarta Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  color:var(--ink);
+  background:var(--bg);
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input{font-family:inherit}
+::selection{background:var(--wash);color:var(--crimson-dk)}
+
+/* ============ APP SHELL ============ */
+.app{min-height:100dvh;min-height:100vh;display:flex;flex-direction:column}
+.wrap{width:100%;max-width:760px;margin:0 auto;padding:0 22px}
+.screen{display:none;flex:1;flex-direction:column;animation:fade .5s ease both}
+.screen.active{display:flex}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ============ TOP BAR ============ */
+.topbar{position:sticky;top:0;z-index:40;display:flex;align-items:center;justify-content:space-between;
+  padding:16px 22px;background:rgba(255,255,255,.82);backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid transparent;transition:border-color .3s}
+.topbar.scrolled{border-color:var(--line)}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em;font-size:16px}
+.brand .dot{width:10px;height:10px;border-radius:50%;background:var(--crimson);box-shadow:0 0 0 4px var(--wash)}
+.brand small{color:var(--ink-3);font-weight:600;font-size:12.5px}
+.prog-mini{font-weight:700;font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+/* ============ BUTTONS ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:15px 26px;border-radius:100px;font-weight:700;font-size:15.5px;letter-spacing:-.01em;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),box-shadow .2s,background .2s;white-space:nowrap}
+.btn:active{transform:scale(.96)}
+.btn-primary{background:var(--crimson);color:#fff;box-shadow:0 8px 22px rgba(210,55,87,.28)}
+.btn-primary:hover{background:var(--crimson-dk);box-shadow:0 10px 28px rgba(210,55,87,.36)}
+.btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line-2)}
+.btn-ghost:hover{border-color:var(--ink-3);background:var(--paper)}
+.btn-lg{padding:17px 34px;font-size:16.5px}
+.btn:disabled{opacity:.4;pointer-events:none}
+.arrow{transition:transform .2s}
+.btn:hover .arrow{transform:translateX(3px)}
+
+/* ============ INTRO SCREEN ============ */
+#intro{justify-content:center;align-items:center;text-align:center;position:relative;padding:40px 0 60px}
+.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
+.aurora span{position:absolute;border-radius:50%;filter:blur(70px);opacity:.5;animation:drift 18s ease-in-out infinite}
+.aurora span:nth-child(1){width:440px;height:440px;background:#F7C9D6;top:-140px;left:-120px}
+.aurora span:nth-child(2){width:400px;height:400px;background:#DDE7FA;bottom:-160px;right:-120px;animation-delay:-6s}
+.aurora span:nth-child(3){width:300px;height:300px;background:#FDE7C4;top:40%;left:55%;animation-delay:-11s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-30px) scale(1.08)}66%{transform:translate(-24px,20px) scale(.96)}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;padding:7px 15px;border-radius:100px;background:#fff;
+  border:1px solid var(--line);box-shadow:var(--shadow);font-weight:700;font-size:12.5px;letter-spacing:.02em;
+  color:var(--ink-2);text-transform:uppercase;margin-bottom:26px}
+.eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--crimson)}
+h1.hero{font-size:clamp(40px,9vw,68px);font-weight:800;letter-spacing:-.035em;line-height:.98;margin-bottom:22px}
+h1.hero .accent{color:var(--crimson)}
+.theme-line{font-size:clamp(17px,4.2vw,21px);color:var(--ink-2);font-weight:500;max-width:460px;margin:0 auto 14px;line-height:1.5}
+.theme-line b{color:var(--ink);font-weight:700}
+.sub{font-size:14.5px;color:var(--ink-3);max-width:420px;margin:0 auto 38px;font-weight:500}
+.voice-orbs{display:flex;gap:10px;justify-content:center;margin-bottom:40px;flex-wrap:wrap}
+.orb{display:flex;align-items:center;gap:8px;padding:8px 14px 8px 10px;background:#fff;border:1px solid var(--line);
+  border-radius:100px;font-weight:700;font-size:13px;box-shadow:var(--shadow);animation:pop .5s ease both}
+.orb i{width:11px;height:11px;border-radius:50%;display:block}
+@keyframes pop{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.meta-note{margin-top:34px;font-size:12.5px;color:var(--ink-3);font-weight:500}
+
+/* ============ IDENTITY SCREEN ============ */
+.center-col{flex:1;display:flex;flex-direction:column;justify-content:center;padding:44px 0}
+.step-label{font-weight:700;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--crimson);margin-bottom:14px}
+h2.q{font-size:clamp(26px,6vw,38px);font-weight:800;letter-spacing:-.03em;line-height:1.08;margin-bottom:10px}
+.q-sub{font-size:15.5px;color:var(--ink-2);margin-bottom:32px;font-weight:500}
+.field{margin-bottom:20px}
+.field label{display:block;font-weight:700;font-size:13.5px;margin-bottom:9px;color:var(--ink)}
+.field label span{color:var(--ink-3);font-weight:500}
+.field input{width:100%;padding:16px 18px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);
+  font-size:16px;font-weight:600;color:var(--ink);background:#fff;transition:border-color .2s,box-shadow .2s}
+.field input::placeholder{color:var(--ink-3);font-weight:500}
+.field input:focus{outline:none;border-color:var(--crimson);box-shadow:0 0 0 4px var(--wash)}
+
+/* ============ QUIZ ============ */
+.qhead{padding-top:30px;margin-bottom:26px}
+.progress-track{height:6px;background:var(--line);border-radius:100px;overflow:hidden;margin-bottom:20px}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,var(--crimson),#E85D7A);border-radius:100px;
+  transition:width .5s cubic-bezier(.65,0,.35,1)}
+.qcount{font-weight:700;font-size:13px;color:var(--ink-3);letter-spacing:.02em}
+.qcount b{color:var(--crimson)}
+.qhint{font-weight:600;font-size:13px;color:var(--ink-3);margin-bottom:18px;display:flex;align-items:center;gap:7px}
+.qhint::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--crimson);opacity:.5}
+.opts{display:flex;flex-direction:column;gap:11px;margin-top:8px}
+.opt .rankbadge{margin-left:auto;flex:0 0 auto;font-weight:800;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;
+  padding:4px 9px;border-radius:100px;color:#fff;background:var(--crimson);opacity:0;transform:scale(.6);transition:.18s}
+.opt.sel .rankbadge{opacity:1;transform:scale(1)}
+.opt.sel.second .rankbadge{background:var(--ink-3)}
+.opt.sel.second{background:linear-gradient(0deg,#F6F4F5,#fff);border-color:var(--line-2)}
+.opt.sel.second .tick{background:var(--ink-3);border-color:var(--ink-3)}
+.opt{display:flex;align-items:center;gap:15px;width:100%;text-align:left;padding:17px 18px;
+  background:#fff;border:1.5px solid var(--line-2);border-radius:var(--r);transition:all .16s ease;position:relative}
+.opt:hover{border-color:var(--ink-3);transform:translateY(-1px);box-shadow:var(--shadow)}
+.opt:active{transform:scale(.99)}
+.opt .tick{flex:0 0 22px;width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);
+  display:flex;align-items:center;justify-content:center;transition:all .16s}
+.opt .tick svg{width:12px;height:12px;stroke:#fff;stroke-width:3.5;fill:none;opacity:0;transform:scale(.5);transition:.16s}
+.opt .txt{font-weight:600;font-size:15.5px;letter-spacing:-.01em;line-height:1.35}
+.opt.sel{border-color:var(--crimson);background:linear-gradient(0deg,var(--wash),#fff)}
+.opt.sel .tick{background:var(--crimson);border-color:var(--crimson)}
+.opt.sel .tick svg{opacity:1;transform:scale(1)}
+.qnav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;gap:12px}
+.link-btn{font-weight:700;font-size:14.5px;color:var(--ink-3);padding:10px 4px;display:inline-flex;align-items:center;gap:6px}
+.link-btn:hover{color:var(--ink)}
+.link-btn:disabled{opacity:0;pointer-events:none}
+
+/* ============ REVEAL / COMPUTE ============ */
+#compute{justify-content:center;align-items:center;text-align:center}
+.spinner{width:54px;height:54px;border-radius:50%;border:4px solid var(--wash);border-top-color:var(--crimson);
+  animation:spin .8s linear infinite;margin-bottom:26px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.compute-txt{font-weight:700;font-size:19px;letter-spacing:-.02em}
+.compute-sub{color:var(--ink-3);font-size:14px;margin-top:6px;font-weight:500}
+
+/* ============ RESULT ============ */
+.result-wrap{padding:28px 0 40px;flex:1}
+.res-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:100px;
+  font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
+.rhero{border-radius:26px;padding:34px 30px;color:#fff;position:relative;overflow:hidden;margin-bottom:26px;
+  box-shadow:var(--shadow-lg)}
+.rhero::after{content:"";position:absolute;right:-40px;top:-40px;width:220px;height:220px;border-radius:50%;
+  background:rgba(255,255,255,.13)}
+.rhero::before{content:"";position:absolute;right:36px;bottom:-70px;width:150px;height:150px;border-radius:50%;
+  background:rgba(255,255,255,.10)}
+.rhero .kicker{font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.85;margin-bottom:12px;position:relative}
+.rhero .vname{font-size:clamp(38px,10vw,60px);font-weight:800;letter-spacing:-.035em;line-height:1;position:relative;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.rhero .glyph{width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.rhero .glyph svg{width:34px;height:34px;fill:#fff}
+.rhero .tagline{font-size:17px;font-weight:600;margin-top:16px;opacity:.96;position:relative;max-width:90%}
+.rhero .axis{display:inline-flex;gap:8px;margin-top:18px;position:relative;flex-wrap:wrap}
+.rhero .chip{background:rgba(255,255,255,.18);padding:6px 13px;border-radius:100px;font-size:12.5px;font-weight:700}
+
+/* mini map */
+.map{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:22px 0 4px;position:relative}
+.map .axl{position:absolute;font-size:10px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.map .cell{border:1.5px solid var(--line);border-radius:12px;padding:12px 12px;display:flex;align-items:center;gap:9px;
+  font-weight:700;font-size:13px;background:#fff;transition:.2s}
+.map .cell i{width:12px;height:12px;border-radius:50%;flex:0 0 auto}
+.map .cell.on{border-width:2px;transform:scale(1.02);box-shadow:var(--shadow)}
+.map .cell small{display:block;font-weight:500;font-size:10.5px;color:var(--ink-3);letter-spacing:.02em}
+
+.sec{margin-top:30px}
+.sec-h{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;letter-spacing:-.02em;margin-bottom:16px}
+.sec-h .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.sec-h .ic svg{width:16px;height:16px;stroke-width:2.4;fill:none}
+.list{display:flex;flex-direction:column;gap:2px}
+.li{display:flex;gap:13px;padding:12px 4px;border-bottom:1px solid var(--line);align-items:flex-start}
+.li:last-child{border-bottom:none}
+.li .mark{flex:0 0 22px;width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.li .mark svg{width:13px;height:13px;stroke-width:2.6;fill:none}
+.li p{font-size:15px;font-weight:500;color:var(--ink);line-height:1.45}
+.li.act{align-items:flex-start}
+.li.act .num{flex:0 0 24px;width:24px;height:24px;border-radius:8px;color:#fff;font-weight:800;font-size:12.5px;
+  display:flex;align-items:center;justify-content:center;margin-top:1px}
+.li.act p b{font-weight:700}
+
+.triggers{margin-top:22px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px}
+.triggers h4{font-size:13px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.triggers ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+.triggers li{font-size:14px;font-weight:500;color:var(--ink-2);padding-left:18px;position:relative}
+.triggers li::before{content:"";position:absolute;left:0;top:8px;width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
+
+.rank{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:20px}
+.rank h4{font-size:13px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--ink-2);margin-bottom:16px}
+.bar-row{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+.bar-row:last-child{margin-bottom:0}
+.bar-row .bl{flex:0 0 82px;font-weight:700;font-size:13px;display:flex;align-items:center;gap:7px}
+.bar-row .bl i{width:9px;height:9px;border-radius:50%}
+.bar-track{flex:1;height:9px;background:var(--line);border-radius:100px;overflow:hidden}
+.bar-fill{height:100%;border-radius:100px;width:0;transition:width .9s cubic-bezier(.65,0,.35,1)}
+.bar-row .bv{flex:0 0 34px;text-align:right;font-weight:700;font-size:12.5px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+/* sticky action bar */
+.actions{position:sticky;bottom:0;z-index:30;background:linear-gradient(0deg,#fff 70%,rgba(255,255,255,0));
+  padding:16px 0 22px;margin-top:14px}
+.actions-inner{display:flex;gap:10px;flex-wrap:wrap}
+.actions .btn{flex:1;min-width:130px}
+.share-row{display:flex;gap:10px;margin-top:10px}
+.share-btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:13px;border-radius:100px;
+  font-weight:700;font-size:14px;border:1.5px solid var(--line-2);background:#fff;color:var(--ink);transition:.18s}
+.share-btn:hover{background:var(--paper);border-color:var(--ink-3)}
+.share-btn svg{width:17px;height:17px}
+.share-btn.wa svg{fill:#25D366}
+
+.footer{text-align:center;padding:26px 0 30px;color:var(--ink-3);font-size:12px;font-weight:500}
+.footer .rec-dot{cursor:pointer;opacity:.5;padding:6px;font-size:11px}
+.footer .rec-dot:hover{opacity:1;color:var(--crimson)}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:28px;transform:translate(-50%,20px);background:var(--ink);color:#fff;
+  padding:13px 22px;border-radius:100px;font-weight:600;font-size:14px;box-shadow:var(--shadow-lg);
+  opacity:0;pointer-events:none;transition:.3s;z-index:100}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* ============ RECORDS MODAL ============ */
+.modal{position:fixed;inset:0;z-index:90;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(20,18,23,.5);backdrop-filter:blur(4px);animation:fade .3s}
+.modal.open{display:flex}
+.sheet{background:#fff;width:100%;max-width:760px;max-height:88dvh;border-radius:22px 22px 0 0;overflow:auto;
+  padding:24px 22px 30px;animation:slideup .35s cubic-bezier(.34,1.4,.64,1)}
+@keyframes slideup{from{transform:translateY(40px);opacity:.6}to{transform:none;opacity:1}}
+.sheet-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sheet-h h3{font-size:22px;font-weight:800;letter-spacing:-.02em}
+.x{width:36px;height:36px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--ink-2)}
+.rec-count{font-size:13px;color:var(--ink-3);font-weight:600;margin-bottom:18px}
+.rec-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.rec-item .av{width:38px;height:38px;border-radius:11px;color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.rec-item .info{flex:1;min-width:0}
+.rec-item .info b{font-weight:700;font-size:14.5px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rec-item .info span{font-size:12.5px;color:var(--ink-3);font-weight:500}
+.rec-item .vv{text-align:right;font-size:12px;font-weight:700}
+.rec-item .vv small{display:block;color:var(--ink-3);font-weight:500;font-size:11px}
+.pass-box{padding:30px 4px}
+.pass-box input{width:100%;padding:15px 18px;border:1.5px solid var(--line-2);border-radius:var(--r-sm);font-size:16px;font-weight:600;text-align:center;letter-spacing:.1em}
+.pass-box input:focus{outline:none;border-color:var(--crimson);box-shadow:0 0 0 4px var(--wash)}
+.rec-actions{display:flex;gap:10px;margin-top:20px}
+.rec-actions .btn{flex:1}
+.empty{text-align:center;padding:40px 0;color:var(--ink-3)}
+
+/* ============ PRINT ============ */
+@media print{
+  .topbar,.actions,.qnav,.footer,.aurora,.modal,.toast,#pdfBtn{display:none!important}
+  body{background:#fff}
+  .screen{display:none!important}
+  #printArea{display:block!important;padding:0}
+  @page{margin:14mm}
+}
+#printArea{display:none}
+
+/* ============ RESPONSIVE ============ */
+@media(max-width:560px){
+  .wrap{padding:0 18px}
+  .rhero{padding:28px 22px;border-radius:22px}
+  .rhero .glyph{width:50px;height:50px}
+  .rhero .glyph svg{width:28px;height:28px}
+  .map{grid-template-columns:1fr 1fr}
+  .actions .btn{min-width:calc(50% - 5px)}
+}
+</style>
+</head>
+<body>
+<div class="aurora"><span></span><span></span><span></span></div>
+
+<div class="app">
+  <!-- TOP BAR -->
+  <div class="topbar" id="topbar">
+    <div class="brand"><span class="dot"></span>Voices at Vutto</div>
+    <div class="prog-mini" id="topMeta"></div>
+  </div>
+
+  <!-- ===== INTRO ===== -->
+  <section class="screen active" id="intro">
+    <div class="wrap">
+      <span class="eyebrow"><span class="dot"></span>The 5 Voices · GiANT</span>
+      <h1 class="hero">Find your<br><span class="accent">voice.</span></h1>
+      <p class="theme-line">Everyone wants to do their best. They all have a way. <b>Their own way.</b></p>
+      <p class="sub">Ten questions to uncover your primary and secondary voice, how you're wired, where you shine, and how to work better with everyone around you.</p>
+      <div class="voice-orbs" id="orbs"></div>
+      <button class="btn btn-primary btn-lg" onclick="go('identity')">Begin <span class="arrow">→</span></button>
+      <p class="meta-note">Takes about 3 minutes · Private to you</p>
+    </div>
+  </section>
+
+  <!-- ===== IDENTITY ===== -->
+  <section class="screen" id="identity">
+    <div class="wrap center-col">
+      <div class="step-label">First, the basics</div>
+      <h2 class="q">Who's taking this?</h2>
+      <p class="q-sub">So we can save your result and address it to you.</p>
+      <div class="field">
+        <label for="nm">Your name</label>
+        <input id="nm" type="text" placeholder="e.g. Sitaram" autocomplete="name" />
+      </div>
+      <div class="field">
+        <label for="ttl">Your title at Vutto <span>(optional)</span></label>
+        <input id="ttl" type="text" placeholder="e.g. Co-founder" autocomplete="organization-title" />
+      </div>
+      <div class="qnav">
+        <button class="link-btn" onclick="go('intro')">← Back</button>
+        <button class="btn btn-primary" id="idNext" onclick="startQuiz()" disabled>Start questions <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== QUIZ ===== -->
+  <section class="screen" id="quiz">
+    <div class="wrap">
+      <div class="qhead">
+        <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+        <div class="qcount">Question <b id="qnum">1</b> of <span id="qtot">10</span></div>
+      </div>
+      <h2 class="q" id="qtext" style="font-size:clamp(22px,5.2vw,30px);margin-bottom:6px"></h2>
+      <div class="qhint" id="qhint">Pick up to 2 — your strongest first</div>
+      <div class="opts" id="opts"></div>
+      <div class="qnav">
+        <button class="link-btn" id="qback" onclick="prevQ()">← Back</button>
+        <button class="btn btn-primary" id="qnext" onclick="nextQ()" disabled>Next <span class="arrow">→</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMPUTE ===== -->
+  <section class="screen" id="compute">
+    <div class="wrap" style="text-align:center;display:flex;flex-direction:column;align-items:center">
+      <div class="spinner"></div>
+      <div class="compute-txt">Reading your voice…</div>
+      <div class="compute-sub" id="computeSub">Weighing all ten answers</div>
+    </div>
+  </section>
+
+  <!-- ===== RESULT ===== -->
+  <section class="screen" id="result">
+    <div class="wrap result-wrap" id="resultBody"></div>
+    <div class="wrap actions">
+      <div class="actions-inner">
+        <button class="btn btn-ghost" id="resToggle" onclick="toggleResult()"></button>
+        <button class="btn btn-primary" id="pdfBtn" onclick="downloadPDF()">⤓ Download PDF</button>
+      </div>
+      <div class="share-row">
+        <button class="share-btn wa" onclick="shareWhatsApp()">
+          <svg viewBox="0 0 24 24"><path d="M17.5 14.4c-.3-.2-1.7-.8-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.2-.5-2.3-1.4-.9-.8-1.4-1.7-1.6-2-.2-.3 0-.5.1-.6l.4-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.6-1.5-.9-2-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s.9 2.5 1.1 2.7c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.4 1.5.5.6.2 1.2.2 1.6.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.4 1.3 4.9L2 22l5.3-1.4c1.4.8 3 1.2 4.7 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18c-1.5 0-3-.4-4.2-1.2l-.3-.2-3.1.8.8-3-.2-.3C4.4 15 4 13.5 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8z"/></svg>
+          WhatsApp
+        </button>
+        <button class="share-btn" onclick="sharePDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#514B57" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+          Email PDF
+        </button>
+        <button class="share-btn" onclick="retake()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#514B57" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+          Retake
+        </button>
+      </div>
+    </div>
+    <div class="wrap footer">
+      Voices at Vutto · Built on GiANT's 5 Voices
+      <div class="rec-dot" onclick="openRecords()">·&nbsp;records</div>
+    </div>
+  </section>
+</div>
+
+<!-- PRINT AREA -->
+<div id="printArea"></div>
+
+<!-- RECORDS MODAL -->
+<div class="modal" id="recModal">
+  <div class="sheet">
+    <div class="sheet-h"><h3>Records</h3><button class="x" onclick="closeRecords()">✕</button></div>
+    <div id="recGate" class="pass-box">
+      <p style="text-align:center;color:var(--ink-2);font-weight:500;margin-bottom:16px;font-size:14px">Enter passcode to view saved results</p>
+      <input id="passIn" type="password" placeholder="passcode" onkeydown="if(event.key==='Enter')checkPass()" />
+      <div class="rec-actions"><button class="btn btn-primary" onclick="checkPass()">Unlock</button></div>
+    </div>
+    <div id="recContent" style="display:none">
+      <div class="rec-count" id="recCount"></div>
+      <div id="recList"></div>
+      <div class="rec-actions">
+        <button class="btn btn-ghost" onclick="exportCSV()">⤓ Export CSV</button>
+        <button class="btn btn-ghost" onclick="clearRecords()" style="color:var(--crimson)">Clear all</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   VOICES AT VUTTO — data + engine
+   Framework: GiANT 5 Voices (Google Cloud CTO Connect 2026)
+   ========================================================= */
+
+/* Central capture: Apps Script web app (deployed "Anyone"), writes each
+   result to the "Voices Results" tab of the leadership sheet. */
+const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbw8brGJZvXh68Rp1CqL8YOFM48kRtvTeWe_dnDo9xmSXpQbM-uYfjdZN2pdcjzmQQbKHg/exec";
+const PASSCODE = "vutto";
+const STORE_KEY = "voicesAtVutto.records.v1";
+
+const VOICES = {
+  nurturer:{
+    name:"Nurturer", color:"var(--nurturer)", hex:"#2E3192",
+    tagline:"The glue. You feel the room before anyone says a word.",
+    axis:["People & Values","Present"], prevalence:"43% of people",
+    quad:"tl",
+    glyph:'<svg viewBox="0 0 24 24"><path d="M12 21s-7-4.6-9.3-9C1.2 8.7 2.6 5.4 5.8 5c1.9-.2 3.4.8 4.2 2.1C10.8 5.8 12.3 4.8 14.2 5c3.2.4 4.6 3.7 3.1 7-2.3 4.4-9.3 9-9.3 9z" opacity=".25"/><path d="M12 8v6M9 11h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>',
+    strengths:[
+      "You sense the emotional undercurrent early — the team's morale radar",
+      "You build deep trust and loyalty; people feel safe and heard around you",
+      "You hold the team together under pressure — the steady, caring center",
+      "You champion people, values and harmony over ego and agenda",
+      "You show up consistently; people can count on your care"
+    ],
+    weaknesses:[
+      "You avoid conflict, so real issues go unsaid and turn into silent resentment",
+      "You mistake keeping the peace for actually solving the problem",
+      "You say yes when you mean no, and over-give until you're drained",
+      "You take tension and feedback too personally",
+      "Under stress you withhold care from those you feel are hurting others"
+    ],
+    actions:[
+      "<b>Name the hard thing early, kindly.</b> Unspoken tension hurts the team more than one honest conversation ever will.",
+      "<b>Say \"I disagree\" out loud.</b> Your read of people is usually right — the team needs to hear it, not just feel it.",
+      "<b>Set a boundary before you're empty.</b> A rested you serves people far better than a depleted one.",
+      "<b>Go direct, not silent.</b> When someone's off, check in privately instead of quietly absorbing it."
+    ],
+    triggers:["You feel taken for granted","Your opinions aren't sought or heard","Values you hold are sidelined or ignored","People you care about are treated unfairly"]
+  },
+  guardian:{
+    name:"Guardian", color:"var(--guardian)", hex:"#D64F2A",
+    tagline:"The backbone. Your slow thinking makes sure decisions actually hold.",
+    axis:["Systems & Logic","Present"], prevalence:"30% of people",
+    quad:"bl",
+    glyph:'<svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 8.5 8 11 4.6-2.5 8-6 8-11V5l-8-3z" opacity=".25"/><path d="m9 12 2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
+    strengths:[
+      "You think slow and thorough; your decisions are stress-tested before they ship",
+      "You steward resources, standards and systems — the reliability engine",
+      "You spot the risk and the missing detail everyone else rushed past",
+      "You deliver what you commit to; your word is trusted",
+      "You keep the org honest and grounded when hype takes over"
+    ],
+    weaknesses:[
+      "You over-index on caution and can slow momentum or kill bold moves",
+      "Your first instinct is to critique before you explore",
+      "You're attached to the proven way; new ideas feel like threats first",
+      "Under stress your focus on risk can lower morale and stifle innovation",
+      "Your volume of questions can make decisive people feel blocked or interrogated"
+    ],
+    actions:[
+      "<b>Lead with what could work</b> before what could break — earn the right to raise the risk.",
+      "<b>Give a clear yes/no by a date.</b> Drivers don't fear your diligence, they fear waiting on it.",
+      "<b>Separate \"risky\" from \"wrong.\"</b> Flag the risk out loud, then get behind the call.",
+      "<b>Affirm first.</b> Your standards land far better when people feel backed, not judged."
+    ],
+    triggers:["You don't trust the competence of the decision maker","People don't take your questions seriously","Unnecessary or careless risk-taking","People challenge your competence"]
+  },
+  connector:{
+    name:"Connector", color:"var(--connector)", hex:"#1B8FC7",
+    tagline:"The rallier. You sell the vision and make people want to join it.",
+    axis:["People & Values","Future"], prevalence:"11% · often the CEO voice",
+    quad:"tr",
+    glyph:'<svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.4" opacity=".9"/><circle cx="5" cy="17" r="2.4" opacity=".9"/><circle cx="19" cy="17" r="2.4" opacity=".9"/><path d="M12 7v4m0 0-5.3 4M12 11l5.3 4" stroke="#fff" stroke-width="1.7" fill="none"/></svg>',
+    strengths:[
+      "You set and sell a compelling vision; a room lifts and moves when you speak",
+      "You build trust and relationships fast — you open doors and pull in resources",
+      "You turn interest into involvement; people want to join your cause",
+      "You carry a strong external presence — the face and voice of the team",
+      "You stay optimistic under pressure and raise the room's ambition"
+    ],
+    weaknesses:[
+      "You overpromise and underdeliver, and exaggerate to sell the dream",
+      "You get scattered, chase multiple ideas, and lose the main thing",
+      "You mistake room excitement for real commitment",
+      "You can steamroll quieter voices without noticing the room went silent",
+      "Under stress you get defensive about critique and scattered in focus"
+    ],
+    actions:[
+      "<b>Speak last</b> in group settings so your energy doesn't quietly shut the room down.",
+      "<b>Pin owners and dates.</b> The room nodding is not the room committed — get it in writing.",
+      "<b>Keep one main thing.</b> Resist chasing every new idea that excites you today.",
+      "<b>Watch who stopped talking</b> and deliberately pull them back in."
+    ],
+    triggers:["People taking credit for your work","People not recognizing the validity of your ideas","You sense people aren't for you","People aren't willing to collaborate"]
+  },
+  creative:{
+    name:"Creative", color:"var(--creative)", hex:"#F4A11E",
+    tagline:"The seer. You spot the pattern and the future before anyone else.",
+    axis:["Systems & Logic","Future"], prevalence:"9% of people",
+    quad:"tr",
+    glyph:'<svg viewBox="0 0 24 24"><path d="M3 21l6-6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M14.5 4.5 19.5 9.5 12 17l-5-5 7.5-7.5z" opacity=".9"/><path d="M14.5 4.5 19.5 9.5" stroke="#fff" stroke-width="1.5"/></svg>',
+    strengths:[
+      "You see patterns and possibilities others can't see yet",
+      "You hold high integrity — you push for what's right, not just what's easy",
+      "You reframe the problem everyone else is stuck on",
+      "You think deep and considered — quality of idea over speed of answer",
+      "You'll name the uncomfortable truth for the sake of the mission"
+    ],
+    weaknesses:[
+      "You get lost in ideas and skip the practical detail and the path to ship",
+      "You're critical — the first draft, yours or theirs, rarely satisfies you",
+      "You withdraw and go quiet when overwhelmed or misunderstood",
+      "You struggle to translate the vision into plain terms others can act on",
+      "Under stress your focus on future ideas makes others feel their concerns are ignored"
+    ],
+    actions:[
+      "<b>Give the idea in one plain sentence</b> before the full architecture.",
+      "<b>Don't judge the first draft</b> — yours or theirs. Let ideas breathe before you critique.",
+      "<b>Think out loud earlier.</b> The team can't follow a process you keep locked in your head.",
+      "<b>Pair with a Guardian or Pioneer</b> to turn the idea into a shippable plan."
+    ],
+    triggers:["Incompetence and inefficiency","People appearing to dismiss your ideas","Decision makers appearing arrogant or complacent","Someone breaks a promise to you"]
+  },
+  pioneer:{
+    name:"Pioneer", color:"var(--pioneer)", hex:"#3EA972",
+    tagline:"The driver. You cut ambiguity and turn strategy into results.",
+    axis:["Systems & Logic","Future"], prevalence:"7% · most Fortune 500 CEOs",
+    quad:"br",
+    glyph:'<svg viewBox="0 0 24 24"><path d="M5 21V4" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M5 4h11l-2 3 2 3H5z" opacity=".95"/></svg>',
+    strengths:[
+      "You cut ambiguity and drive outcomes — you break stalemates and force progress",
+      "You raise ambition and stay comfortable with pressure and hard problems",
+      "You're strategic and decisive; you make the call when others hesitate",
+      "You're results-focused — you hate to lose, and it makes the team win",
+      "Hand you the hard problem and you run straight at it"
+    ],
+    weaknesses:[
+      "You overpower the room; quiet voices go silent and you don't notice",
+      "Results over people — you say harsh things when frustrated",
+      "You move faster than trust allows and push timelines that break the team",
+      "You're impatient with process, detail and \"the how\"",
+      "Under stress you can treat people who differ as obstacles, not features"
+    ],
+    actions:[
+      "<b>Speak last and ask the quiet people first.</b> Your volume flattens the room without you noticing.",
+      "<b>Deliver hard feedback with grace,</b> never in the heat of frustration.",
+      "<b>Slow the big irreversible calls.</b> Let trust and diligence catch up to your pace.",
+      "<b>Ask what a differing person is seeing</b> before you override them."
+    ],
+    triggers:["Frustration with the incompetence of others","People challenging your competence","People threatening your vision","Inefficiency and unnecessary delays"]
+  }
+};
+const ORDER = ["nurturer","guardian","connector","creative","pioneer"];
+
+/* 10 questions — each option maps to one voice (+2). Balanced: every voice appears once per question. */
+const QUESTIONS = [
+  {q:"A big new decision lands on the team. Your first instinct is to…", o:[
+    ["nurturer","Check how everyone's feeling and make sure no one gets steamrolled"],
+    ["guardian","Slow down, ask the hard questions, and stress-test the risks"],
+    ["connector","Get people energized and rally them behind where this could go"],
+    ["creative","Step back and reimagine the whole thing from a fresh angle"],
+    ["pioneer","Cut the ambiguity, make the call, and drive it to a result"]]},
+  {q:"Under pressure, what frustrates you most?", o:[
+    ["nurturer","People being treated unfairly or not being heard"],
+    ["guardian","Careless risk-taking and people not taking your questions seriously"],
+    ["connector","People not collaborating, or not recognizing your ideas"],
+    ["creative","Incompetence, inefficiency, and dismissing new ideas too fast"],
+    ["pioneer","Delays and anyone threatening the vision"]]},
+  {q:"In a meeting, you're usually the one who…", o:[
+    ["nurturer","Reads the room and notices who's gone quiet"],
+    ["guardian","Brings the data, the plan, and the \"have we thought about…\""],
+    ["connector","Brings the energy and gets everyone bought in"],
+    ["creative","Offers the idea nobody else saw coming"],
+    ["pioneer","Pushes for a decision so we stop talking and start moving"]]},
+  {q:"Your teammates would say your superpower is…", o:[
+    ["nurturer","You make people feel safe, valued and heard"],
+    ["guardian","You're reliable and you deliver exactly what you promise"],
+    ["connector","You open doors and make things happen through people"],
+    ["creative","You see patterns and possibilities before anyone else"],
+    ["pioneer","You get results when everyone else is stuck"]]},
+  {q:"When you disagree with a plan, you tend to…", o:[
+    ["nurturer","Hold back to keep the peace, even when it costs you"],
+    ["guardian","Lay out the risks and the evidence for why it won't work"],
+    ["connector","Talk it out and bring people around to your side"],
+    ["creative","Propose a completely different way of doing it"],
+    ["pioneer","Say it straight and push for the better call"]]},
+  {q:"What energizes you most at work?", o:[
+    ["nurturer","A team that trusts each other and pulls together"],
+    ["guardian","Order, clear standards, and a well-run system"],
+    ["connector","A big vision and people fired up to chase it"],
+    ["creative","Solving a problem in a way it's never been solved"],
+    ["pioneer","Winning — hitting the target and moving fast"]]},
+  {q:"Being honest, your blind spot is…", o:[
+    ["nurturer","Avoiding conflict until resentment quietly builds up"],
+    ["guardian","Over-caution that slows momentum and dampens bold ideas"],
+    ["connector","Getting scattered and mistaking excitement for commitment"],
+    ["creative","Getting lost in ideas and skipping the practical details"],
+    ["pioneer","Overpowering quieter voices without noticing"]]},
+  {q:"When a teammate is struggling, you…", o:[
+    ["nurturer","Check in privately and make sure they feel supported"],
+    ["guardian","Help them build a clear, structured plan to get back on track"],
+    ["connector","Reconnect them to the bigger why and re-energize them"],
+    ["creative","Help them reframe the problem and see a new path"],
+    ["pioneer","Give them a clear target and the push to hit it"]]},
+  {q:"Your ideal role on a team is…", o:[
+    ["nurturer","The glue that holds people together"],
+    ["guardian","The backbone that keeps things solid and dependable"],
+    ["connector","The face that rallies people and builds the network"],
+    ["creative","The mind that brings the fresh thinking"],
+    ["pioneer","The driver who turns strategy into results"]]},
+  {q:"At your best, what do you bring the team?", o:[
+    ["nurturer","Harmony, care, and a place where everyone belongs"],
+    ["guardian","Stability, diligence, and decisions that hold up"],
+    ["connector","Vision, momentum, and belief"],
+    ["creative","Originality, insight, and the future"],
+    ["pioneer","Direction, decisiveness, and the win"]]}
+];
+
+/* ---------------- STATE ---------------- */
+/* answers[i] = array of voice keys in tap order (0, 1 or 2). First = "Most" (+2), second = "Also" (+1). */
+const MAX_PICK = 2;
+let answers = Array.from({length:QUESTIONS.length}, ()=>[]);
+let cur = 0;
+let person = {name:"",title:""};
+let RESULT = null;          // {primary, secondary, scores}
+let showingSecondary = false;
+let savedThisRun = false;
+
+/* ---------------- NAV ---------------- */
+const screens = ["intro","identity","quiz","compute","result"];
+function go(id){
+  screens.forEach(s=>document.getElementById(s).classList.toggle("active", s===id));
+  window.scrollTo({top:0,behavior:"instant"});
+  updateTopMeta(id);
+}
+function updateTopMeta(id){
+  const m=document.getElementById("topMeta");
+  if(id==="quiz") m.textContent = `${cur+1} / ${QUESTIONS.length}`;
+  else if(id==="result" && RESULT) m.textContent = person.name || "";
+  else m.textContent="";
+}
+
+/* intro orbs */
+(function(){
+  const el=document.getElementById("orbs");
+  ORDER.forEach((k,i)=>{
+    const v=VOICES[k];
+    const o=document.createElement("div");
+    o.className="orb"; o.style.animationDelay=(i*.08)+"s";
+    o.innerHTML=`<i style="background:${v.hex}"></i>${v.name}`;
+    el.appendChild(o);
+  });
+})();
+
+/* identity gating */
+const nm=document.getElementById("nm"), ttl=document.getElementById("ttl"), idNext=document.getElementById("idNext");
+nm.addEventListener("input",()=>{ idNext.disabled = nm.value.trim().length<2; });
+
+function startQuiz(){
+  person.name = nm.value.trim();
+  person.title = ttl.value.trim();
+  answers = Array.from({length:QUESTIONS.length}, ()=>[]);
+  cur=0; savedThisRun=false;
+  renderQ();
+  go("quiz");
+}
+
+/* ---------------- QUIZ RENDER ---------------- */
+function renderQ(){
+  const Q=QUESTIONS[cur];
+  document.getElementById("qnum").textContent=cur+1;
+  document.getElementById("qtot").textContent=QUESTIONS.length;
+  document.getElementById("pfill").style.width = ((cur)/QUESTIONS.length*100)+"%";
+  document.getElementById("qtext").textContent=Q.q;
+  document.getElementById("qback").disabled = cur===0;
+  const wrap=document.getElementById("opts"); wrap.innerHTML="";
+  Q.o.forEach((opt,i)=>{
+    const [voice,label]=opt;
+    const b=document.createElement("button");
+    b.dataset.voice=voice;
+    b.className="opt";
+    b.innerHTML=`<span class="tick"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></span>`+
+                `<span class="txt">${label}</span><span class="rankbadge"></span>`;
+    b.onclick=()=>toggleOpt(voice);
+    wrap.appendChild(b);
+  });
+  paintOpts();
+  updateTopMeta("quiz");
+}
+function toggleOpt(voice){
+  const picks=answers[cur];
+  const idx=picks.indexOf(voice);
+  if(idx>-1){ picks.splice(idx,1); }             // deselect
+  else if(picks.length<MAX_PICK){ picks.push(voice); }
+  else { toast("Pick up to 2 — tap one to swap"); return; }
+  paintOpts();
+}
+function paintOpts(){
+  const picks=answers[cur];
+  [...document.getElementById("opts").children].forEach(b=>{
+    const rank=picks.indexOf(b.dataset.voice);       // -1, 0 (Most), 1 (Also)
+    b.classList.toggle("sel", rank>-1);
+    b.classList.toggle("second", rank===1);
+    b.querySelector(".rankbadge").textContent = rank===0 ? "Most" : rank===1 ? "Also" : "";
+  });
+  document.getElementById("qnext").disabled = picks.length===0;
+  const done=(cur + (picks.length?1:0))/QUESTIONS.length*100;
+  document.getElementById("pfill").style.width = done+"%";
+  document.getElementById("qnext").textContent = cur===QUESTIONS.length-1 ? "See my voice" : "Next";
+  const a=document.createElement("span"); a.className="arrow"; a.textContent="→";
+  document.getElementById("qnext").appendChild(a);
+}
+function nextQ(){
+  if(answers[cur].length===0) return;
+  if(cur<QUESTIONS.length-1){ cur++; renderQ(); window.scrollTo({top:0,behavior:"smooth"}); }
+  else finish();
+}
+function prevQ(){ if(cur>0){ cur--; renderQ(); window.scrollTo({top:0,behavior:"smooth"}); } }
+
+/* ---------------- SCORING ---------------- */
+function compute(){
+  const s={nurturer:0,guardian:0,connector:0,creative:0,pioneer:0};
+  // First pick = "Most" (+2), second = "Also" (+1)
+  answers.forEach(picks=>{
+    if(picks[0]!=null) s[picks[0]]+=2;
+    if(picks[1]!=null) s[picks[1]]+=1;
+  });
+  // rank with deterministic tiebreak: score desc, then framework rarity (rarer ranks higher as differentiator)
+  const rarity={connector:5,pioneer:4,creative:3,guardian:2,nurturer:1};
+  const ranked=ORDER.slice().sort((a,b)=> (s[b]-s[a]) || (rarity[b]-rarity[a]));
+  return {scores:s, primary:ranked[0], secondary:ranked[1], ranked};
+}
+function finish(){
+  document.getElementById("pfill").style.width="100%";
+  RESULT=compute();
+  go("compute");
+  const subs=["Weighing all ten answers","Mapping you on the grid","Finding your primary voice","Finding your secondary voice"];
+  let i=0; const cs=document.getElementById("computeSub");
+  const iv=setInterval(()=>{ i++; if(i<subs.length) cs.textContent=subs[i]; },430);
+  setTimeout(()=>{ clearInterval(iv); showingSecondary=false; renderResult(); saveRecord(); go("result"); },1850);
+}
+
+/* ---------------- RESULT RENDER ---------------- */
+const QUAD={
+  tl:{label:"People & Values · Present"},
+  tr:{label:"People/Logic · Future"},
+  bl:{label:"Systems & Logic · Present"},
+  br:{label:"Systems & Logic · Future"}
+};
+function voiceCard(key, kind){
+  const v=VOICES[key];
+  const other = kind==="primary" ? VOICES[RESULT.secondary] : VOICES[RESULT.primary];
+  const s=RESULT.scores; const max=Math.max(...Object.values(s),1);
+  const badgeBg = kind==="primary" ? "background:var(--wash);color:var(--crimson-dk)" : "background:#EEF1F6;color:#334155";
+  // rank bars
+  let bars="";
+  RESULT.ranked.forEach(k=>{
+    const vv=VOICES[k]; const pct=Math.round(s[k]/max*100);
+    bars+=`<div class="bar-row"><div class="bl"><i style="background:${vv.hex}"></i>${vv.name}</div>
+      <div class="bar-track"><div class="bar-fill" style="background:${vv.hex}" data-w="${pct}"></div></div>
+      <div class="bv">${s[k]}</div></div>`;
+  });
+  // 2x2 map
+  const cellDef=[
+    {q:"tl",n:"Nurturer",k:"nurturer",sub:"People · Present"},
+    {q:"tr",n:"Connector / Creative",k:"connector",sub:"People/Logic · Future"},
+    {q:"bl",n:"Guardian",k:"guardian",sub:"Logic · Present"},
+    {q:"br",n:"Pioneer / Creative",k:"pioneer",sub:"Logic · Future"}
+  ];
+  let cells="";
+  cellDef.forEach(c=>{
+    // Creative spans both Future quadrants (tr + br)
+    const on = key==="creative" ? (c.q==="tr"||c.q==="br") : v.quad===c.q;
+    const col = on? v.hex : "#C9C4CE";
+    cells+=`<div class="cell ${on?'on':''}" style="${on?'border-color:'+v.hex:''}"><i style="background:${col}"></i><div>${c.n}<small>${c.sub}</small></div></div>`;
+  });
+
+  const strengths=v.strengths.map(x=>`<div class="li"><span class="mark" style="background:${hexA(v.hex,.14)}"><svg viewBox="0 0 24 24" stroke="${v.hex}"><path d="M4 12l5 5L20 6"/></svg></span><p>${x}</p></div>`).join("");
+  const weak=v.weaknesses.map(x=>`<div class="li"><span class="mark" style="background:#F3EEF0"><svg viewBox="0 0 24 24" stroke="#8A8390"><path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/></svg></span><p>${x}</p></div>`).join("");
+  const acts=v.actions.map((x,i)=>`<div class="li act"><span class="num" style="background:${v.hex}">${i+1}</span><p>${x}</p></div>`).join("");
+  const trig=v.triggers.map(x=>`<li>${x}</li>`).join("");
+
+  return `
+  <span class="res-badge" style="${badgeBg}">${kind==="primary"?"★ Your primary voice":"◆ Your secondary voice"}</span>
+  <div class="rhero" style="background:linear-gradient(135deg,${v.hex},${shade(v.hex,-22)})">
+    <div class="kicker">${person.name}${person.title?" · "+person.title:""}</div>
+    <div class="vname"><span class="glyph">${v.glyph}</span>${v.name}</div>
+    <div class="tagline">${v.tagline}</div>
+    <div class="axis"><span class="chip">${v.axis[0]}</span><span class="chip">${v.axis[1]}</span><span class="chip">${v.prevalence}</span></div>
+  </div>
+
+  <div class="map">${cells}</div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="ic" style="background:${hexA(v.hex,.14)}"><svg viewBox="0 0 24 24" stroke="${v.hex}"><path d="M5 13l4 4L19 7"/></svg></span>Where you shine</div>
+    <div class="list">${strengths}</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="ic" style="background:#F3EEF0"><svg viewBox="0 0 24 24" stroke="#8A8390"><path d="M12 9v4M12 16.5v.3"/><path d="M10.3 3.9 2.4 18a2 2 0 0 0 1.7 3h15.8a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/></svg></span>Watch your edges</div>
+    <div class="list">${weak}</div>
+  </div>
+
+  <div class="triggers">
+    <h4>⚡ What sets you off</h4>
+    <ul>${trig}</ul>
+  </div>
+
+  <div class="sec">
+    <div class="sec-h"><span class="ic" style="background:${v.hex}"><svg viewBox="0 0 24 24" stroke="#fff"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>Do better with others</div>
+    <div class="list">${acts}</div>
+  </div>
+
+  <div class="rank">
+    <h4>Your full voice profile</h4>
+    ${bars}
+  </div>
+  `;
+}
+function renderResult(){
+  const key = showingSecondary ? RESULT.secondary : RESULT.primary;
+  const kind = showingSecondary ? "secondary" : "primary";
+  document.getElementById("resultBody").innerHTML = voiceCard(key,kind);
+  const t=document.getElementById("resToggle");
+  t.textContent = showingSecondary ? "← Back to primary" : "See secondary voice →";
+  // animate bars
+  setTimeout(()=>document.querySelectorAll(".bar-fill").forEach(b=>b.style.width=b.dataset.w+"%"),60);
+  window.scrollTo({top:0,behavior:"smooth"});
+  updateTopMeta("result");
+}
+function toggleResult(){ showingSecondary=!showingSecondary; renderResult(); }
+
+/* ---------------- COLOR UTILS ---------------- */
+function hexA(hex,a){const n=parseInt(hex.slice(1),16);return `rgba(${n>>16&255},${n>>8&255},${n&255},${a})`;}
+function shade(hex,p){let n=parseInt(hex.slice(1),16);let r=n>>16&255,g=n>>8&255,b=n&255;
+  r=Math.max(0,Math.min(255,r+p));g=Math.max(0,Math.min(255,g+p));b=Math.max(0,Math.min(255,b+p));
+  return "#"+((1<<24)+(r<<16)+(g<<8)+b).toString(16).slice(1);}
+
+/* ---------------- RECORDS ---------------- */
+function loadRecords(){ try{return JSON.parse(localStorage.getItem(STORE_KEY))||[]}catch(e){return []} }
+function saveRecord(){
+  if(savedThisRun) return; savedThisRun=true;
+  const rec={
+    name:person.name, title:person.title,
+    primary:VOICES[RESULT.primary].name, secondary:VOICES[RESULT.secondary].name,
+    scores:RESULT.scores,
+    date:new Date().toISOString()
+  };
+  const arr=loadRecords(); arr.push(rec);
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }catch(e){}
+  pushToSheet(rec);
+}
+/* Post the result to the Apps Script web app → central sheet.
+   text/plain + no-cors avoids a CORS preflight; response is opaque, doPost runs. */
+function pushToSheet(rec){
+  if(!WEBHOOK_URL) return;
+  try{
+    fetch(WEBHOOK_URL,{method:"POST",mode:"no-cors",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(rec)});
+  }catch(e){}
+}
+function openRecords(){
+  document.getElementById("recModal").classList.add("open");
+  document.getElementById("recGate").style.display="block";
+  document.getElementById("recContent").style.display="none";
+  document.getElementById("passIn").value="";
+  setTimeout(()=>document.getElementById("passIn").focus(),200);
+}
+function closeRecords(){ document.getElementById("recModal").classList.remove("open"); }
+function checkPass(){
+  if(document.getElementById("passIn").value.trim().toLowerCase()===PASSCODE){
+    document.getElementById("recGate").style.display="none";
+    document.getElementById("recContent").style.display="block";
+    renderRecords();
+  } else { toast("Wrong passcode"); }
+}
+function renderRecords(){
+  const arr=loadRecords().slice().reverse();
+  document.getElementById("recCount").textContent = arr.length? `${arr.length} result${arr.length>1?"s":""} saved on this device` : "";
+  const list=document.getElementById("recList");
+  if(!arr.length){ list.innerHTML=`<div class="empty">No results yet.<br>Completed assessments will show up here.</div>`; return; }
+  const vhex=n=>{const k=ORDER.find(k=>VOICES[k].name===n);return k?VOICES[k].hex:"#999"};
+  list.innerHTML=arr.map(r=>{
+    const d=new Date(r.date); const ds=d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"2-digit"});
+    return `<div class="rec-item">
+      <div class="av" style="background:${vhex(r.primary)}">${(r.name||"?").charAt(0).toUpperCase()}</div>
+      <div class="info"><b>${esc(r.name)}</b><span>${r.title?esc(r.title)+" · ":""}${ds}</span></div>
+      <div class="vv" style="color:${vhex(r.primary)}">${r.primary}<small>then ${r.secondary}</small></div>
+    </div>`;
+  }).join("");
+}
+function exportCSV(){
+  const arr=loadRecords();
+  if(!arr.length){ toast("Nothing to export"); return; }
+  const head=["Name","Title","Primary Voice","Secondary Voice","Nurturer","Guardian","Connector","Creative","Pioneer","Date"];
+  const rows=arr.map(r=>[r.name,r.title,r.primary,r.secondary,r.scores.nurturer,r.scores.guardian,r.scores.connector,r.scores.creative,r.scores.pioneer,r.date]
+    .map(c=>`"${String(c==null?"":c).replace(/"/g,'""')}"`).join(","));
+  const csv=[head.join(","),...rows].join("\n");
+  const blob=new Blob([csv],{type:"text/csv"});
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+  a.download="voices-at-vutto-records.csv"; a.click();
+  toast("CSV exported");
+}
+function clearRecords(){
+  if(confirm("Delete all saved results on this device? This can't be undone.")){
+    localStorage.removeItem(STORE_KEY); renderRecords(); toast("Records cleared");
+  }
+}
+
+/* ---------------- SHARE / EXPORT ---------------- */
+function summaryText(){
+  const p=VOICES[RESULT.primary], s=VOICES[RESULT.secondary];
+  return `Voices at Vutto — my result\n\n${person.name}${person.title?" ("+person.title+")":""}\n`+
+    `★ Primary voice: ${p.name} — ${p.tagline}\n`+
+    `◆ Secondary voice: ${s.name} — ${s.tagline}\n\n`+
+    `Where I shine: ${p.strengths[0]}.\n`+
+    `Working better with others: ${p.actions[0].replace(/<[^>]+>/g,"")}\n\n`+
+    `Everyone wants to do their best. They all have a way. Their own way.`;
+}
+function shareWhatsApp(){ window.open("https://wa.me/?text="+encodeURIComponent(summaryText()),"_blank"); }
+function shareEmail(){
+  const subj=`My Voices at Vutto result — ${VOICES[RESULT.primary].name} / ${VOICES[RESULT.secondary].name}`;
+  window.location.href=`mailto:?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(summaryText())}`;
+}
+function retake(){
+  nm.value=""; ttl.value=""; idNext.disabled=true;
+  answers=Array.from({length:QUESTIONS.length}, ()=>[]); cur=0; RESULT=null; showingSecondary=false;
+  go("intro");
+}
+
+/* ---------------- REAL PDF (jsPDF) ---------------- */
+function pdfRGB(hex){const n=parseInt(hex.slice(1),16);return [n>>16&255,n>>8&255,n&255];}
+function pdfName(){ return "Voices-at-Vutto-"+((person.name||"result").replace(/[^a-z0-9]+/gi,"-").replace(/^-|-$/g,""))+".pdf"; }
+function buildPDFDoc(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:"pt", format:"a4"});
+  const PW = doc.internal.pageSize.getWidth();
+  const PH = doc.internal.pageSize.getHeight();
+  const M = 42, CW = PW - M*2;
+  let y = 0;
+  const ensure = sp => { if(y+sp > PH-42){ doc.addPage(); y=50; header(true); } };
+
+  function header(cont){
+    y = 50;
+    doc.setTextColor(20,18,23); doc.setFont("helvetica","bold"); doc.setFontSize(17);
+    doc.text("Voices at Vutto", M, y);
+    doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(138,131,144);
+    doc.text("Everyone wants to do their best. They all have a way. Their own way.", M, y+14);
+    doc.setFont("helvetica","bold"); doc.setFontSize(12.5); doc.setTextColor(20,18,23);
+    doc.text(person.name||"", PW-M, y, {align:"right"});
+    doc.setFont("helvetica","normal"); doc.setFontSize(8.5); doc.setTextColor(138,131,144);
+    doc.text(person.title||"Vutto", PW-M, y+13, {align:"right"});
+    const [r,g,b]=pdfRGB(VOICES[RESULT.primary].hex);
+    doc.setDrawColor(r,g,b); doc.setLineWidth(2); doc.line(M, y+24, PW-M, y+24);
+    y += 44;
+  }
+  function heading(txt, hex){
+    ensure(30);
+    const [r,g,b]=pdfRGB(hex);
+    doc.setFont("helvetica","bold"); doc.setFontSize(11); doc.setTextColor(r,g,b);
+    doc.text(txt.toUpperCase(), M, y); y += 15;
+  }
+  function bullets(items, hex, numbered){
+    doc.setFontSize(10.5);
+    items.forEach((raw,i)=>{
+      const txt = raw.replace(/<[^>]+>/g,"");
+      const lines = doc.splitTextToSize(txt, CW-22);
+      ensure(lines.length*13 + 7);
+      const [r,g,b]=pdfRGB(hex);
+      if(numbered){ doc.setFont("helvetica","bold"); doc.setTextColor(r,g,b); doc.text((i+1)+".", M, y); }
+      else { doc.setFillColor(r,g,b); doc.circle(M+3, y-3.5, 2, "F"); }
+      doc.setFont("helvetica","normal"); doc.setTextColor(58,53,62);
+      doc.text(lines, M+18, y);
+      y += lines.length*13 + 7;
+    });
+    y += 6;
+  }
+  function band(v, kind){
+    ensure(112);
+    const [r,g,b]=pdfRGB(v.hex);
+    doc.setFillColor(r,g,b); doc.roundedRect(M, y, CW, 94, 10, 10, "F");
+    doc.setTextColor(255,255,255);
+    doc.setFont("helvetica","bold"); doc.setFontSize(8);
+    doc.text(kind.toUpperCase()+" VOICE", M+18, y+22);
+    doc.setFontSize(25); doc.text(v.name, M+18, y+49);
+    doc.setFont("helvetica","normal"); doc.setFontSize(10.5);
+    doc.text(doc.splitTextToSize(v.tagline, CW-36), M+18, y+67);
+    doc.setFontSize(8.5);
+    doc.text(v.axis[0]+"   ·   "+v.axis[1]+"   ·   "+v.prevalence, M+18, y+85);
+    y += 94 + 18;
+  }
+  function section(v, kind){
+    band(v, kind);
+    heading("Where you shine", v.hex);        bullets(v.strengths, v.hex, false);
+    heading("Watch your edges", "#8A8390");    bullets(v.weaknesses, "#8A8390", false);
+    heading("Do better with others", v.hex);   bullets(v.actions, v.hex, true);
+    heading("What sets you off", "#8A8390");    bullets(v.triggers, "#8A8390", false);
+  }
+
+  header();
+  section(VOICES[RESULT.primary], "Primary");
+  doc.addPage(); header();
+  section(VOICES[RESULT.secondary], "Secondary");
+  doc.setFont("helvetica","normal"); doc.setFontSize(8); doc.setTextColor(138,131,144);
+  doc.text("Built on GiANT's 5 Voices framework · Google Cloud CTO Connect 2026", M, PH-26);
+  return doc;
+}
+function downloadPDF(){
+  if(!window.jspdf){ toast("PDF still loading, try again"); return; }
+  try{ buildPDFDoc().save(pdfName()); toast("PDF downloaded"); }
+  catch(e){ toast("Couldn't build PDF"); }
+}
+async function sharePDF(){
+  if(!window.jspdf){ toast("PDF still loading, try again"); return; }
+  let doc; try{ doc=buildPDFDoc(); }catch(e){ toast("Couldn't build PDF"); return; }
+  const file=new File([doc.output("blob")], pdfName(), {type:"application/pdf"});
+  if(navigator.canShare && navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file], title:"Voices at Vutto", text:summaryText()}); return; }
+    catch(e){ if(e && e.name==="AbortError") return; }
+  }
+  // Desktop fallback: download the PDF, then open an email draft to attach it
+  doc.save(pdfName());
+  toast("PDF downloaded — attach it to your email");
+  setTimeout(shareEmail, 500);
+}
+
+/* ---------------- MISC ---------------- */
+function esc(s){return String(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+let toastT;
+function toast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove("show"),2200);}
+window.addEventListener("scroll",()=>{document.getElementById("topbar").classList.toggle("scrolled",window.scrollY>8);});
+document.getElementById("recModal").addEventListener("click",e=>{if(e.target.id==="recModal")closeRecords();});
+if(location.hash==="#records") openRecords();
+</script>
+</body>
+</html>
