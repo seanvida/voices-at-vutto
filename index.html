@@ -159,6 +159,8 @@ h2.q{font-size:clamp(26px,6vw,38px);font-weight:800;letter-spacing:-.03em;line-h
 
 /* ============ RESULT ============ */
 .result-wrap{padding:28px 0 40px;flex:1}
+.done-note{display:flex;align-items:center;gap:8px;background:#EAF7EF;color:#1E7C4A;border:1px solid #BFE8CE;
+  border-radius:100px;padding:10px 16px;font-weight:700;font-size:13px;margin-bottom:18px}
 .res-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border-radius:100px;
   font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-bottom:18px}
 .rhero{border-radius:26px;padding:34px 30px;color:#fff;position:relative;overflow:hidden;margin-bottom:26px;
@@ -418,6 +420,8 @@ h2.q{font-size:clamp(26px,6vw,38px);font-weight:800;letter-spacing:-.03em;line-h
    result to the "Voices Results" tab of the leadership sheet. */
 const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbw8brGJZvXh68Rp1CqL8YOFM48kRtvTeWe_dnDo9xmSXpQbM-uYfjdZN2pdcjzmQQbKHg/exec";
 const PASSCODE = "vutto";
+/* One result per person. These names can retake freely (match the server EXEMPT list). */
+const EXEMPT_NAMES = ["rohit", "rohit khurana"];
 const STORE_KEY = "voicesAtVutto.records.v1";
 
 const VOICES = {
@@ -637,6 +641,7 @@ let person = {name:"",title:""};
 let RESULT = null;          // {primary, secondary, scores}
 let showingSecondary = false;
 let savedThisRun = false;
+let alreadyDone = false;
 
 /* ---------------- NAV ---------------- */
 const screens = ["intro","identity","quiz","compute","result"];
@@ -671,10 +676,34 @@ nm.addEventListener("input",()=>{ idNext.disabled = nm.value.trim().length<2; })
 function startQuiz(){
   person.name = nm.value.trim();
   person.title = ttl.value.trim();
+  // One per person: if this device already has a result for this name, show it (unless exempt).
+  const key = person.name.toLowerCase();
+  const prior = EXEMPT_NAMES.includes(key) ? null : findRecordByName(person.name);
+  if(prior){
+    person.title = person.title || prior.title || "";
+    RESULT = rebuildResult(prior);
+    showingSecondary=false; savedThisRun=true; alreadyDone=true;
+    renderResult(); go("result");
+    toast("You've already found your voice — here's your result");
+    return;
+  }
   answers = Array.from({length:QUESTIONS.length}, ()=>[]);
-  cur=0; savedThisRun=false;
+  cur=0; savedThisRun=false; alreadyDone=false;
   renderQ();
   go("quiz");
+}
+function findRecordByName(name){
+  const key=(name||"").trim().toLowerCase();
+  const arr=loadRecords();
+  for(let i=arr.length-1;i>=0;i--){ if((arr[i].name||"").trim().toLowerCase()===key) return arr[i]; }
+  return null;
+}
+function rebuildResult(rec){
+  const toKey=n=>ORDER.find(k=>VOICES[k].name===n)||ORDER[0];
+  const s=rec.scores||{nurturer:0,guardian:0,connector:0,creative:0,pioneer:0};
+  const rarity={connector:5,pioneer:4,creative:3,guardian:2,nurturer:1};
+  const ranked=ORDER.slice().sort((a,b)=>(s[b]-s[a])||(rarity[b]-rarity[a]));
+  return {scores:s, primary:toKey(rec.primary), secondary:toKey(rec.secondary), ranked};
 }
 
 /* ---------------- QUIZ RENDER ---------------- */
@@ -833,6 +862,10 @@ function renderResult(){
   const key = showingSecondary ? RESULT.secondary : RESULT.primary;
   const kind = showingSecondary ? "secondary" : "primary";
   document.getElementById("resultBody").innerHTML = voiceCard(key,kind);
+  if(alreadyDone && !showingSecondary){
+    document.getElementById("resultBody").insertAdjacentHTML("afterbegin",
+      `<div class="done-note">✓ You've already completed this. Here's your saved result.</div>`);
+  }
   const t=document.getElementById("resToggle");
   t.textContent = showingSecondary ? "← Back to primary" : "See secondary voice →";
   // animate bars
@@ -937,7 +970,7 @@ function shareEmail(){
 }
 function retake(){
   nm.value=""; ttl.value=""; idNext.disabled=true;
-  answers=Array.from({length:QUESTIONS.length}, ()=>[]); cur=0; RESULT=null; showingSecondary=false;
+  answers=Array.from({length:QUESTIONS.length}, ()=>[]); cur=0; RESULT=null; showingSecondary=false; alreadyDone=false;
   go("intro");
 }
 
